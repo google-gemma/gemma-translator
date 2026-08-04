@@ -1,0 +1,693 @@
+/**
+ * Copyright 2026 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Simple Retro-Terminal Style optimized for 480x320 Handheld (Landscape) */
+:root {
+  --bg-black: #ffa500;
+  --red-bright: #000000;
+  --red-dim: #000000;
+  --red-muted: #000000;
+  --border-color: #000000;
+  --border-glow: #000000;
+  --font-mono:
+    "Roboto Mono", "Courier New", "Noto Sans CJK KR", "Noto Sans CJK JP",
+    "Noto Sans CJK SC", "Noto Sans CJK TC", monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  font-family: var(--font-mono) !important;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-black);
+  color: var(--red-bright);
+  overflow: hidden;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+@media (min-width: 1001px) {
+  html,
+  body {
+    cursor: auto;
+  }
+
+  #root {
+    border: 1px solid var(--border-color);
+  }
+}
+
+body {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+/* App Wrapper - hardcoded 480x320 landscape */
+.translator-envelope {
+  position: relative;
+  width: 480px;
+  max-width: 480px;
+  height: 320px;
+  max-height: 320px;
+  background-color: var(--bg-black);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-wrap-left {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  z-index: 10;
+}
+
+.config-wrap-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+}
+
+.connection-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--red-bright);
+}
+
+.connection-indicator.connected {
+  background-color: var(--red-bright);
+  box-shadow: 0 0 6px var(--red-bright);
+}
+
+.connection-indicator.disconnected {
+  background-color: var(--bg-black);
+}
+
+.connection-indicator.testing {
+  background-color: var(--red-bright);
+  animation: pulse-indicator 0.5s infinite alternate;
+}
+
+@keyframes pulse-indicator {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.config-toggle-btn {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--red-bright);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.config-toggle-btn:active {
+  background: var(--red-bright);
+  color: var(--bg-black);
+}
+
+/* Controls workspace – fixed height at bottom */
+.translator-workspace {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* Side-by-Side Languages Row */
+.languages-container {
+  display: flex;
+  width: 100%;
+  height: 60px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-black);
+}
+
+/* Language Lanes */
+.language-lane {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  background: var(--bg-black);
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.lane-one {
+  border-right: 1px solid var(--border-color);
+}
+
+/* Recording state: full color reversal */
+.language-lane.recording {
+  background: var(--red-bright);
+}
+.language-lane.recording .lane-label,
+.language-lane.recording .language-name {
+  color: var(--bg-black);
+}
+.language-lane.recording .rotator-arrow {
+  background: var(--red-bright);
+  border-color: var(--bg-black);
+  color: var(--bg-black);
+}
+
+/* Selected state: corner brackets on all 4 corners */
+.language-lane.selected {
+}
+.corner-brackets {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+.language-lane.selected::before,
+.language-lane.selected::after,
+.language-lane.selected .corner-brackets::before,
+.language-lane.selected .corner-brackets::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--red-bright);
+  border-style: solid;
+  pointer-events: none;
+  z-index: 5;
+}
+/* ┌ Top-left */
+.language-lane.selected::before {
+  top: 3px;
+  left: 3px;
+  border-width: 2px 0 0 2px;
+}
+/* ┐ Top-right */
+.language-lane.selected::after {
+  top: 3px;
+  right: 3px;
+  border-width: 2px 2px 0 0;
+}
+/* └ Bottom-left */
+.language-lane.selected .corner-brackets::before {
+  bottom: 3px;
+  left: 3px;
+  border-width: 0 0 2px 2px;
+}
+/* ┘ Bottom-right */
+.language-lane.selected .corner-brackets::after {
+  bottom: 3px;
+  right: 3px;
+  border-width: 0 2px 2px 0;
+}
+
+/* When recording + selected, brackets invert to black */
+.language-lane.recording.selected::before,
+.language-lane.recording.selected::after,
+.language-lane.recording.selected .corner-brackets::before,
+.language-lane.recording.selected .corner-brackets::after {
+  border-color: var(--bg-black);
+}
+
+.lane-header {
+  position: absolute;
+  top: 6px;
+  left: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.lane-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red-bright);
+}
+
+.key-hint {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bg-black);
+  background: var(--red-bright);
+  padding: 1px 3px;
+  border-radius: 2px;
+}
+
+/* Revolver Drum Language Selector */
+.revolver-stage {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  min-height: 0;
+}
+
+.rotator-arrow {
+  background: var(--bg-black);
+  border: 1px solid var(--border-color);
+  color: var(--red-bright);
+  font-size: 12px;
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 3;
+  transition:
+    background 0.1s,
+    color 0.1s;
+  visibility: hidden; /* keyboard-first kiosk: arrows kept for layout only */
+}
+
+.rotator-arrow:active,
+.rotator-arrow.active {
+  background: var(--red-bright);
+  color: var(--bg-black);
+}
+
+/* Flat viewport — retro display window */
+.revolver-viewport {
+  flex: 1;
+  height: 24px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Vertical list instead of clock pivot */
+.revolver-drum {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease-out;
+}
+
+/* Each language in the list */
+.revolver-item {
+  width: 100%;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--red-bright);
+  white-space: nowrap;
+}
+
+/* Recording state */
+.language-lane.recording .revolver-item {
+  color: var(--bg-black);
+}
+.language-lane.recording .rotator-arrow {
+  background: var(--red-bright);
+  border-color: var(--bg-black);
+  color: var(--bg-black);
+}
+
+/* Visualizer Divider Bar */
+.visualizer-divider {
+  height: 28px;
+  background: var(--bg-black);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-wrap {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+
+#visualizer-canvas {
+  width: 100%;
+  height: 28px;
+  display: block;
+}
+
+.timer-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-black);
+  border: 1px solid var(--border-color);
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.timer-text {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--red-bright);
+}
+
+/* Chat Panel (fills remaining space below visualizer) */
+.response-drawer {
+  flex: 1 1 0;
+  width: 100%;
+  background: var(--bg-black);
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.app-title {
+  font-family: var(--font-mono) !important;
+  text-align: left;
+  width: 100%;
+  font-size: 12px;
+  color: var(--red-bright);
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--border-color);
+  background: var(--bg-black);
+  flex-shrink: 0;
+  visibility: hidden;
+}
+
+.chat-panel {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px 8px 4px;
+  gap: 4px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.initial-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--red-bright);
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* Each row is a flex row that aligns the bubble */
+.chat-row {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.chat-row-left {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+.chat-row-right {
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+/* Bubbles */
+.chat-bubble {
+  max-width: 82%;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 10px;
+  background: var(--bg-black);
+  position: relative;
+}
+
+/* Left bubble: sharp bottom-left corner (tail) */
+.bubble-left {
+  border-bottom-left-radius: 1px;
+  box-shadow: -2px 2px 0 var(--red-muted);
+}
+
+/* Right bubble: sharp bottom-right corner (tail) */
+.bubble-right {
+  border-bottom-right-radius: 1px;
+  box-shadow: 2px 2px 0 var(--red-muted);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.bubble-right:hover {
+  background: var(--red-muted);
+}
+
+.bubble-right:active {
+  background: var(--red-bright);
+}
+.bubble-right:active .bubble-text,
+.bubble-right:active .bubble-label {
+  color: var(--bg-black);
+}
+
+.bubble-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--red-dim);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bubble-text {
+  font-size: 18px;
+  line-height: 1.35;
+  color: var(--red-bright);
+  word-break: break-word;
+  user-select: text;
+}
+
+.chat-meta {
+  visibility: hidden; /* duration/tokens are computed but hidden on the kiosk */
+  font-size: 9px;
+  color: var(--red-muted);
+  text-align: center;
+  padding-top: 2px;
+  min-height: 10px;
+}
+
+/* Collapsible Settings Fullscreen Overlay Form */
+.settings-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-black);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: all 0.2s ease-out;
+  pointer-events: none;
+  border: 1px solid var(--border-color);
+}
+
+.settings-overlay.active {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.overlay-header {
+  height: 38px;
+  padding: 0 10px;
+  background: var(--bg-black);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.overlay-header h2 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--red-bright);
+}
+
+.overlay-close-btn {
+  background: none;
+  border: none;
+  color: var(--red-bright);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.overlay-body {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red-bright);
+}
+
+.input-inline {
+  display: flex;
+  gap: 6px;
+}
+
+.input-inline input {
+  flex-grow: 1;
+  min-width: 0; /* Prevent flex child from overflowing on narrow screens */
+}
+
+.overlay-body input[type="text"],
+.overlay-body input[type="password"],
+.overlay-body select {
+  background-color: var(--bg-black);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+  color: var(--red-bright);
+  padding: 4px 6px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.overlay-body input[type="text"]:focus,
+.overlay-body input[type="password"]:focus,
+.overlay-body select:focus {
+  outline: none;
+  background: var(--bg-black);
+}
+
+.overlay-btn {
+  background: var(--bg-black);
+  border: 1px solid var(--border-color);
+  color: var(--red-bright);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.overlay-btn:active {
+  background: var(--red-bright);
+  color: var(--bg-black);
+}
+
+.form-row-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0;
+  background: var(--bg-black);
+  padding: 6px;
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.checkbox-container input {
+  accent-color: var(--red-bright);
+}
+
+.checkbox-label {
+  font-size: 13px;
+  color: var(--red-bright);
+}
+
+.slider-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.slider-group {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.slider-group input[type="range"] {
+  width: 100%;
+  accent-color: var(--red-bright);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.app-container {
+  position: relative;
+  width: 480px;
+  height: 320px;
+}
+
