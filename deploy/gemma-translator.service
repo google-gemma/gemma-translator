@@ -1,0 +1,17 @@
+[Unit]
+Description=Gemma Offline Translator Appliance
+After=network.target sound.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User={{USER}}
+WorkingDirectory={{PROJECT_DIR}}
+ExecStart={{PROJECT_DIR}}/start.sh --prod
+Restart=always
+RestartSec=5
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=XDG_RUNTIME_DIR=/run/user/{{UID}}
+
+[Install]
+WantedBy=multi-user.target
