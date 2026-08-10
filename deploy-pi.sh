@@ -65,7 +65,7 @@ echo "[3/7] Installing frontend dependencies & building production UI..."
 npm --prefix "${PROJECT_DIR}/frontend" install
 npm --prefix "${PROJECT_DIR}/frontend" run build
 
-echo "[4/7] Downloading LiteRT model..."
+echo "[4/7] Downloading LiteRT-LM model..."
 "${PROJECT_DIR}/download_model.sh"
 
 echo "[5/7] Registering systemd service..."

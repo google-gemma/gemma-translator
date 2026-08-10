@@ -162,7 +162,7 @@ export default function SettingsOverlay({
           <label>API Key</label>
           <input
             type="password"
-            placeholder="Optional api key"
+            placeholder="Optional API key"
             value={config.apiKey}
             onChange={(e) => handleChange("apiKey", e.target.value)}
           />
