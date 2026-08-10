@@ -71,7 +71,7 @@ To deploy as a permanent systemd kiosk service on a Raspberry Pi 5 (8GB):
 ```bash
 ./deploy-pi.sh
 ```
-This automated script installs Debian audio/venv packages, sets up the Python environment, builds production UI assets, downloads the LiteRT model, registers the systemd unit from `deploy/gemma-translator.service`, and configures LXDE GUI autostart (`~/.config/lxsession/rpd-x/autostart`) to launch Chromium in kiosk mode pointing to `http://localhost:3000`.
+This automated script installs Debian audio/venv packages, sets up the Python environment, builds production UI assets, downloads the LiteRT-LM model, registers the systemd unit from `deploy/gemma-translator.service`, and configures LXDE GUI autostart (`~/.config/lxsession/rpd-x/autostart`) to launch Chromium in kiosk mode pointing to `http://localhost:3000`.
 
 ## Project Structure
 
@@ -80,7 +80,7 @@ This automated script installs Debian audio/venv packages, sets up the Python en
 - `deploy/` - Parameterizable systemd service unit template (`gemma-translator.service`).
 - `stl/` - STL files for 3D printing the hardware case.
 - `setup.sh` - Automates Python virtual environment creation and dependency installation.
-- `download_model.sh` - Fetches the required LiteRT model.
+- `download_model.sh` - Fetches the required LiteRT-LM model.
 - `start.sh` - Multi-process launcher supporting `--prod` and development modes.
 - `deploy-pi.sh` - One-command Raspberry Pi automated deployment script.
 
@@ -137,7 +137,8 @@ Open **Settings (⚙)** → **Keyboard Mode** → choose **Landscape** or **Vert
 | `landscape` | Active-person scheme (Space / Z / ← →) — default |
 | `vertical` | Two-hand scheme (Z / X / ← → / − +) |
 
-### Credits
+## Credits
+
 Made by a small team at [Google Creative Lab](https://github.com/googlecreativelab):
 - [Alan Yam](https://github.com/alanvww)
 - [Shashwath Santosh](https://x.com/shashwth)

@@ -45,7 +45,7 @@ export default function ResponseDrawer({
       <div className="chat-panel">
         {!hasData ? (
           <div className="initial-placeholder">
-            {placeholderText || "Select languages, push to talk"}
+            {placeholderText || "Select languages, then push to talk."}
           </div>
         ) : (
           <>
