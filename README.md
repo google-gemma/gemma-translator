@@ -137,7 +137,7 @@ Open **Settings (⚙)** → **Keyboard Mode** → choose **Landscape** or **Vert
 | `landscape` | Active-person scheme (Space / Z / ← →) — default |
 | `vertical` | Two-hand scheme (Z / X / ← → / − +) |
 
-### Credits
+## Credits
 Made by a small team at [Google Creative Lab](https://github.com/googlecreativelab):
 - [Alan Yam](https://github.com/alanvww)
 - [Shashwath Santosh](https://x.com/shashwth)
